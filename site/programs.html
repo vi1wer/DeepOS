@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>G-Store — DeepOS</title>
+<link rel="icon" href="favicon.svg">
+<link rel="stylesheet" href="css/site.css?v=20261006">
+</head>
+<body>
+<header class="top">
+  <div class="row">
+    <a class="logo" href="index.html"><i></i> DeepOS</a>
+    <nav class="main">
+      <a href="desktop.html">Возможности ✨</a>
+      <a href="programs.html" aria-current="page">G-Store 🛒</a>
+      <a href="look.html">Старт</a>
+      <a href="news.html">Сборка</a>
+      <a href="help.html">Поддержка</a>
+    </nav>
+    <form action="help.html" method="get">
+      <input class="search" type="search" name="q" placeholder="Поиск" aria-label="Поиск">
+    </form>
+  </div>
+</header>
+
+<main>
+  <div class="wrap page-hero">
+    <p class="kicker">G-Store</p>
+    <h1>Программы этого стола</h1>
+    <p>Все карточки магазина. Откройте программу — там оценка, что она делает и как её запустить.</p>
+  </div>
+  <div class="wrap">
+    <input class="finder" id="finder" type="search" placeholder="Найти программу" aria-label="Найти программу">
+    <div class="chips" id="chips">
+      <button type="button" class="on" data-cat="all">Все</button>
+      <button type="button" data-cat="games">Игры</button>
+      <button type="button" data-cat="talk">Общение</button>
+      <button type="button" data-cat="net">Интернет</button>
+      <button type="button" data-cat="art">Творчество</button>
+      <button type="button" data-cat="tool">Программы</button>
+    </div>
+    <p id="empty" hidden>Ничего не нашлось.</p>
+    <div class="store-grid" id="grid">
+    <a class="appcard" href="store/supertux.html" data-cat="games" data-blob="supertux платформер: прыжки, лёд и уровни. игры">
+      <span class="mark" style="background:#2f6b4f">🏃</span>
+      <span><h3>SuperTux</h3><p>Игры · 4,8</p></span>
+    </a>
+    <a class="appcard" href="store/supertuxkart.html" data-cat="games" data-blob="supertuxkart гонки на картах с бонусами. игры">
+      <span class="mark" style="background:#8a3d2c">🏁</span>
+      <span><h3>SuperTuxKart</h3><p>Игры · 4,7</p></span>
+    </a>
+    <a class="appcard" href="store/xonotic.html" data-cat="games" data-blob="xonotic быстрая арена и стрельба. игры">
+      <span class="mark" style="background:#343a86">🎯</span>
+      <span><h3>Xonotic</h3><p>Игры · 4,6</p></span>
+    </a>
+    <a class="appcard" href="store/wesnoth.html" data-cat="games" data-blob="wesnoth пошаговые битвы и отряды. игры">
+      <span class="mark" style="background:#6d5624">🏰</span>
+      <span><h3>Wesnoth</h3><p>Игры · 4,8</p></span>
+    </a>
+    <a class="appcard" href="store/widelands.html" data-cat="games" data-blob="widelands посёлок, дороги и захват земель. игры">
+      <span class="mark" style="background:#6d5624">🏰</span>
+      <span><h3>Widelands</h3><p>Игры · 4,5</p></span>
+    </a>
+    <a class="appcard" href="store/freeciv.html" data-cat="games" data-blob="freeciv города, наука и соседи. игры">
+      <span class="mark" style="background:#6d5624">🏰</span>
+      <span><h3>FreeCiv</h3><p>Игры · 4,4</p></span>
+    </a>
+    <a class="appcard" href="store/openttd.html" data-cat="games" data-blob="openttd поезда, дороги и растущие города. игры">
+      <span class="mark" style="background:#6d5624">🏰</span>
+      <span><h3>OpenTTD</h3><p>Игры · 4,7</p></span>
+    </a>
+    <a class="appcard" href="store/minetest.html" data-cat="games" data-blob="minetest мир из кубиков. в магазине эта игра ставится как luanti. игры">
+      <span class="mark" style="background:#1f6a62">🧊</span>
+      <span><h3>Minetest</h3><p>Игры · 4,6</p></span>
+    </a>
+    <a class="appcard" href="store/pingus.html" data-cat="games" data-blob="pingus загадки: доведи пингвинов до выхода. игры">
+      <span class="mark" style="background:#245a7a">🐧</span>
+      <span><h3>Pingus</h3><p>Игры · 4,4</p></span>
+    </a>
+    <a class="appcard" href="store/lbreakout2.html" data-cat="games" data-blob="lbreakout2 аркада: отбивай кирпичи. игры">
+      <span class="mark" style="background:#7a3458">🧱</span>
+      <span><h3>LBreakout2</h3><p>Игры · 4,2</p></span>
+    </a>
+    <a class="appcard" href="store/scummvm.html" data-cat="games" data-blob="scummvm старые квесты в одном окне. игры">
+      <span class="mark" style="background:#3c4a32">🕹</span>
+      <span><h3>ScummVM</h3><p>Игры · 4,5</p></span>
+    </a>
+    <a class="appcard" href="store/dosbox.html" data-cat="games" data-blob="dosbox staging старые игры в отдельном окне. игры">
+      <span class="mark" style="background:#3c4a32">🕹</span>
+      <span><h3>DOSBox Staging</h3><p>Игры · 4,5</p></span>
+    </a>
+    <a class="appcard" href="store/retroarch.html" data-cat="games" data-blob="retroarch зал для своих игровых образов. игры">
+      <span class="mark" style="background:#3c4a32">🕹</span>
+      <span><h3>RetroArch</h3><p>Игры · 4,4</p></span>
+    </a>
+    <a class="appcard" href="store/mednafen.html" data-cat="games" data-blob="mednafen ещё один зал для образов игр. игры">
+      <span class="mark" style="background:#3c4a32">🕹</span>
+      <span><h3>Mednafen</h3><p>Игры · 4,2</p></span>
+    </a>
+    <a class="appcard" href="store/mupen64plus.html" data-cat="games" data-blob="mupen64plus образы консольных игр. игры">
+      <span class="mark" style="background:#3c4a32">🕹</span>
+      <span><h3>Mupen64Plus</h3><p>Игры · 4,3</p></span>
+    </a>
+    <a class="appcard" href="store/deepchat.html" data-cat="talk" data-blob="deepchat сообщения этого компьютера. никуда не отправляются. общение">
+      <span class="mark" style="background:#8a5a28">💬</span>
+      <span><h3>DeepChat</h3><p>Общение · 4,9</p></span>
+    </a>
+    <a class="appcard" href="store/telegram.html" data-cat="talk" data-blob="telegram чаты, каналы и звонки. общение">
+      <span class="mark" style="background:#8a5a28">💬</span>
+      <span><h3>Telegram</h3><p>Общение · 4,7</p></span>
+    </a>
+    <a class="appcard" href="store/dino.html" data-cat="talk" data-blob="dino переписка в своей учётной записи. общение">
+      <span class="mark" style="background:#8a5a28">💬</span>
+      <span><h3>Dino</h3><p>Общение · 4,4</p></span>
+    </a>
+    <a class="appcard" href="store/nheko.html" data-cat="talk" data-blob="nheko комнаты и общие чаты. общение">
+      <span class="mark" style="background:#8a5a28">💬</span>
+      <span><h3>Nheko</h3><p>Общение · 4,5</p></span>
+    </a>
+    <a class="appcard" href="store/pidgin.html" data-cat="talk" data-blob="pidgin несколько сетей в одном окне. общение">
+      <span class="mark" style="background:#8a5a28">💬</span>
+      <span><h3>Pidgin</h3><p>Общение · 4,2</p></span>
+    </a>
+    <a class="appcard" href="store/sun.html" data-cat="net" data-blob="sun browser браузер этого стола. интернет">
+      <span class="mark" style="background:#2e5a46">🌐</span>
+      <span><h3>Sun Browser</h3><p>Интернет · 4,6</p></span>
+    </a>
+    <a class="appcard" href="store/firefox.html" data-cat="net" data-blob="firefox вкладки, закладки и расширения. интернет">
+      <span class="mark" style="background:#2e5a46">🌐</span>
+      <span><h3>Firefox</h3><p>Интернет · 4,8</p></span>
+    </a>
+    <a class="appcard" href="store/chromium.html" data-cat="net" data-blob="chromium второй браузер, уже на столе. интернет">
+      <span class="mark" style="background:#2e5a46">🌐</span>
+      <span><h3>Chromium</h3><p>Интернет · 4,7</p></span>
+    </a>
+    <a class="appcard" href="store/thunderbird.html" data-cat="net" data-blob="thunderbird почта в своём ящике. интернет">
+      <span class="mark" style="background:#6a4030">✉</span>
+      <span><h3>Thunderbird</h3><p>Интернет · 4,5</p></span>
+    </a>
+    <a class="appcard" href="store/filezilla.html" data-cat="net" data-blob="filezilla передача файлов на сервер. интернет">
+      <span class="mark" style="background:#245060">⇅</span>
+      <span><h3>FileZilla</h3><p>Интернет · 4,3</p></span>
+    </a>
+    <a class="appcard" href="store/transmission.html" data-cat="net" data-blob="transmission загрузки больших файлов. интернет">
+      <span class="mark" style="background:#245060">⇅</span>
+      <span><h3>Transmission</h3><p>Интернет · 4,4</p></span>
+    </a>
+    <a class="appcard" href="store/gimp.html" data-cat="art" data-blob="gimp рисунки, слои и правка фото. творчество">
+      <span class="mark" style="background:#8a4a22">🖌</span>
+      <span><h3>GIMP</h3><p>Творчество · 4,8</p></span>
+    </a>
+    <a class="appcard" href="store/krita.html" data-cat="art" data-blob="krita кисти и холст для рисунка. творчество">
+      <span class="mark" style="background:#8a4a22">🖌</span>
+      <span><h3>Krita</h3><p>Творчество · 4,7</p></span>
+    </a>
+    <a class="appcard" href="store/inkscape.html" data-cat="art" data-blob="inkscape знаки, кривые и вектор. творчество">
+      <span class="mark" style="background:#8a4a22">🖌</span>
+      <span><h3>Inkscape</h3><p>Творчество · 4,6</p></span>
+    </a>
+    <a class="appcard" href="store/blender.html" data-cat="art" data-blob="blender трёхмерные сцены и герои. творчество">
+      <span class="mark" style="background:#4a3868">◇</span>
+      <span><h3>Blender</h3><p>Творчество · 4,8</p></span>
+    </a>
+    <a class="appcard" href="store/darktable.html" data-cat="art" data-blob="darktable проявка и цвет фотографий. творчество">
+      <span class="mark" style="background:#3a4038">📷</span>
+      <span><h3>Darktable</h3><p>Творчество · 4,5</p></span>
+    </a>
+    <a class="appcard" href="store/audacity.html" data-cat="art" data-blob="audacity запись и правка звука. творчество">
+      <span class="mark" style="background:#6a3052">🎙</span>
+      <span><h3>Audacity</h3><p>Творчество · 4,6</p></span>
+    </a>
+    <a class="appcard" href="store/obs.html" data-cat="art" data-blob="obs studio запись экрана и эфир. творчество">
+      <span class="mark" style="background:#243656">🎬</span>
+      <span><h3>OBS Studio</h3><p>Творчество · 4,5</p></span>
+    </a>
+    <a class="appcard" href="store/vlc.html" data-cat="art" data-blob="vlc кино, музыка и сеть. творчество">
+      <span class="mark" style="background:#5c3030">▶</span>
+      <span><h3>VLC</h3><p>Творчество · 4,7</p></span>
+    </a>
+    <a class="appcard" href="store/mpv.html" data-cat="art" data-blob="mpv проигрыватель без лишнего. творчество">
+      <span class="mark" style="background:#5c3030">▶</span>
+      <span><h3>mpv</h3><p>Творчество · 4,4</p></span>
+    </a>
+    <a class="appcard" href="store/celluloid.html" data-cat="art" data-blob="celluloid кино в простом окне. творчество">
+      <span class="mark" style="background:#5c3030">▶</span>
+      <span><h3>Celluloid</h3><p>Творчество · 4,3</p></span>
+    </a>
+    <a class="appcard" href="store/strawberry.html" data-cat="art" data-blob="strawberry своя полка с музыкой. творчество">
+      <span class="mark" style="background:#5a3044">🎵</span>
+      <span><h3>Strawberry</h3><p>Творчество · 4,5</p></span>
+    </a>
+    <a class="appcard" href="store/rhythmbox.html" data-cat="art" data-blob="rhythmbox музыка и радио. творчество">
+      <span class="mark" style="background:#5a3044">🎵</span>
+      <span><h3>Rhythmbox</h3><p>Творчество · 4,3</p></span>
+    </a>
+    <a class="appcard" href="store/kodi.html" data-cat="art" data-blob="kodi медиацентр на весь экран. творчество">
+      <span class="mark" style="background:#5c3030">▶</span>
+      <span><h3>Kodi</h3><p>Творчество · 4,4</p></span>
+    </a>
+    <a class="appcard" href="store/shotwell.html" data-cat="art" data-blob="shotwell альбом фотографий. творчество">
+      <span class="mark" style="background:#3a4038">📷</span>
+      <span><h3>Shotwell</h3><p>Творчество · 4,2</p></span>
+    </a>
+    <a class="appcard" href="store/writer.html" data-cat="art" data-blob="libreoffice тексты, письма и страницы. творчество">
+      <span class="mark" style="background:#4a453c">📄</span>
+      <span><h3>LibreOffice</h3><p>Творчество · 4,6</p></span>
+    </a>
+    <a class="appcard" href="store/calc.html" data-cat="art" data-blob="libreoffice таблицы числа, формулы и листы. творчество">
+      <span class="mark" style="background:#245848">▦</span>
+      <span><h3>LibreOffice Таблицы</h3><p>Творчество · 4,5</p></span>
+    </a>
+    <a class="appcard" href="store/slides.html" data-cat="art" data-blob="libreoffice слайды показ слайдов. творчество">
+      <span class="mark" style="background:#6a4a28">🖼</span>
+      <span><h3>LibreOffice Слайды</h3><p>Творчество · 4,4</p></span>
+    </a>
+    <a class="appcard" href="store/geany.html" data-cat="tool" data-blob="geany редактор кода с подсветкой. программы">
+      <span class="mark" style="background:#243028">⌘</span>
+      <span><h3>Geany</h3><p>Программы · 4,5</p></span>
+    </a>
+    <a class="appcard" href="store/archiver.html" data-cat="tool" data-blob="архиватор архивы zip и 7z. программы">
+      <span class="mark" style="background:#3c3832">🔧</span>
+      <span><h3>Архиватор</h3><p>Программы · 4,3</p></span>
+    </a>
+    <a class="appcard" href="store/calc-app.html" data-cat="tool" data-blob="калькулятор обычные и инженерные расчёты. программы">
+      <span class="mark" style="background:#3c3832">🔧</span>
+      <span><h3>Калькулятор</h3><p>Программы · 4,4</p></span>
+    </a>
+    <a class="appcard" href="store/notepad.html" data-cat="tool" data-blob="блокнот простой текст без оформления. программы">
+      <span class="mark" style="background:#4a453c">📄</span>
+      <span><h3>Блокнот</h3><p>Программы · 4,3</p></span>
+    </a>
+    <a class="appcard" href="store/pdf.html" data-cat="tool" data-blob="просмотр pdf страницы pdf. программы">
+      <span class="mark" style="background:#4a453c">📄</span>
+      <span><h3>Просмотр PDF</h3><p>Программы · 4,4</p></span>
+    </a>
+    <a class="appcard" href="store/keepassxc.html" data-cat="tool" data-blob="keepassxc пароли в своей базе. программы">
+      <span class="mark" style="background:#3a4034">🔒</span>
+      <span><h3>KeePassXC</h3><p>Программы · 4,7</p></span>
+    </a>
+    <a class="appcard" href="store/gparted.html" data-cat="tool" data-blob="gparted разделы диска. программы">
+      <span class="mark" style="background:#2e4254">💾</span>
+      <span><h3>GParted</h3><p>Программы · 4,3</p></span>
+    </a>
+    <a class="appcard" href="store/gthumb.html" data-cat="tool" data-blob="gthumb просмотр снимков. программы">
+      <span class="mark" style="background:#3a4038">📷</span>
+      <span><h3>gThumb</h3><p>Программы · 4,2</p></span>
+    </a>
+    <a class="appcard" href="store/abiword.html" data-cat="tool" data-blob="abiword короткий текст и письмо. программы">
+      <span class="mark" style="background:#4a453c">📄</span>
+      <span><h3>AbiWord</h3><p>Программы · 4,1</p></span>
+    </a>
+    <a class="appcard" href="store/gnumeric.html" data-cat="tool" data-blob="gnumeric лёгкие таблицы. программы">
+      <span class="mark" style="background:#245848">▦</span>
+      <span><h3>Gnumeric</h3><p>Программы · 4,2</p></span>
+    </a>
+    <a class="appcard" href="store/shot.html" data-cat="tool" data-blob="снимок экрана снимок этого стола. программы">
+      <span class="mark" style="background:#4a3a30">📸</span>
+      <span><h3>Снимок экрана</h3><p>Программы · 4,6</p></span>
+    </a>
+    </div>
+  </div>
+</main>
+<script>
+(function () {
+  var q = document.getElementById("finder");
+  var grid = document.getElementById("grid");
+  var empty = document.getElementById("empty");
+  var cat = "all";
+  function apply() {
+    var needle = q.value.trim().toLowerCase();
+    var shown = 0;
+    Array.prototype.forEach.call(grid.children, function (card) {
+      var okCat = cat === "all" || card.getAttribute("data-cat") === cat;
+      var okText = !needle || card.getAttribute("data-blob").indexOf(needle) !== -1;
+      var on = okCat && okText;
+      card.hidden = !on;
+      if (on) shown += 1;
+    });
+    empty.hidden = shown !== 0;
+  }
+  q.addEventListener("input", apply);
+  document.getElementById("chips").addEventListener("click", function (ev) {
+    var btn = ev.target.closest("button");
+    if (!btn) return;
+    cat = btn.getAttribute("data-cat");
+    Array.prototype.forEach.call(btn.parentNode.children, function (el) {
+      el.classList.toggle("on", el === btn);
+    });
+    apply();
+  });
+})();
+</script>
+<footer class="foot">
+  <div class="row"><div class="legal"><a href="index.html">DeepOS</a><span>Сборка <span class="deepos-day">2026.10.15</span></span></div></div>
+</footer>
+</body>
+</html>

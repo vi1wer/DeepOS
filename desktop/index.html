@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>DeepOS — Рабочий стол</title>
+<style>
+  :root {
+    --bg-void: #050d16;
+    --bg-deep: #0a1929;
+    --bg-panel: #122b45;
+    --cyan: #00d4ff;
+    --purple: #7b2ff7;
+    --magenta: #f107a3;
+    --accent: #64ffda;
+    --white: #e6f1ff;
+    --gray: #8892b0;
+    --panel-h: 44px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+  html, body {
+    width: 100%; height: 100%; overflow: hidden;
+    font-family: 'Noto Sans', 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg-void); color: var(--white);
+  }
+  .desktop {
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse at 30% 20%, rgba(123, 47, 247, 0.35), transparent 50%),
+      radial-gradient(ellipse at 80% 70%, rgba(0, 212, 255, 0.25), transparent 50%),
+      radial-gradient(ellipse at 50% 100%, rgba(241, 7, 163, 0.15), transparent 60%),
+      linear-gradient(180deg, #050d16 0%, #0a1929 100%);
+  }
+  .stars {
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 20% 30%, white, transparent),
+      radial-gradient(1px 1px at 60% 70%, white, transparent),
+      radial-gradient(1px 1px at 80% 20%, white, transparent),
+      radial-gradient(2px 2px at 90% 50%, var(--cyan), transparent),
+      radial-gradient(1px 1px at 10% 60%, white, transparent),
+      radial-gradient(1px 1px at 70% 40%, white, transparent);
+    opacity: 0.7; animation: twinkle 4s ease-in-out infinite;
+  }
+  @keyframes twinkle { 0%, 100% { opacity: 0.7; } 50% { opacity: 0.3; } }
+  .watermark {
+    position: absolute; bottom: 80px; right: 80px;
+    width: 400px; height: 400px; opacity: 0.04; pointer-events: none;
+  }
+  .taskbar {
+    position: fixed; top: 0; left: 0; right: 0; height: var(--panel-h);
+    background: rgba(10, 25, 41, 0.85);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+    display: flex; align-items: center; padding: 0 12px; gap: 8px; z-index: 1000;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.5);
+  }
+  .start-btn {
+    display: flex; align-items: center; gap: 8px; padding: 6px 14px;
+    border-radius: 8px; cursor: pointer; transition: all 0.2s; border: 1px solid transparent;
+  }
+  .start-btn:hover { background: rgba(0, 212, 255, 0.1); border-color: rgba(0, 212, 255, 0.3); }
+  .start-btn.active { background: rgba(0, 212, 255, 0.15); border-color: var(--cyan); }
+  .start-btn svg { width: 22px; height: 22px; }
+  .start-btn .label {
+    font-weight: 700; font-size: 14px;
+    background: linear-gradient(90deg, var(--cyan), var(--purple));
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .divider { width: 1px; height: 24px; background: rgba(255,255,255,0.1); margin: 0 4px; }
+  .tasks { display: flex; gap: 6px; flex: 1; overflow: hidden; }
+  .task-item {
+    display: flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 6px;
+    background: rgba(255,255,255,0.05); font-size: 12px; cursor: pointer;
+    border: 1px solid transparent; max-width: 180px; overflow: hidden; white-space: nowrap;
+  }
+  .task-item:hover { background: rgba(0, 212, 255, 0.15); border-color: rgba(0, 212, 255, 0.3); }
+  .task-item.active { background: rgba(0, 212, 255, 0.2); border-color: var(--cyan); }
+  .task-item .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
+  .tray { display: flex; align-items: center; gap: 12px; padding: 0 8px; }
+  .tray-item {
+    display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--gray);
+    cursor: pointer; padding: 4px 6px; border-radius: 6px;
+  }
+  .tray-item:hover { color: var(--cyan); background: rgba(0,212,255,0.1); }
+  .tray-item svg { width: 16px; height: 16px; }
+  .tray-item.on { color: var(--accent); }
+  .clock {
+    display: flex; flex-direction: column; align-items: flex-end; padding: 4px 10px;
+    border-radius: 6px; cursor: pointer; line-height: 1.1;
+  }
+  .clock:hover { background: rgba(0,212,255,0.1); }
+  .clock .time { font-size: 13px; font-weight: 700; color: var(--white); }
+  .clock .date { font-size: 10px; color: var(--gray); }
+  .start-menu {
+    position: fixed; top: calc(var(--panel-h) + 8px); left: 12px; width: 340px;
+    background: rgba(10, 25, 41, 0.95);
+    backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+    border: 1px solid rgba(0, 212, 255, 0.3); border-radius: 12px; padding: 16px;
+    z-index: 999; box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 40px rgba(123, 47, 247, 0.2);
+    opacity: 0; transform: translateY(-10px) scale(0.98); pointer-events: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .start-menu.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+  .start-menu-header {
+    display: flex; align-items: center; gap: 12px; padding: 8px 12px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 12px;
+  }
+  .user-avatar {
+    width: 42px; height: 42px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 18px; color: var(--bg-void);
+  }
+  .user-info .name { font-weight: 700; font-size: 14px; }
+  .user-info .role { font-size: 11px; color: var(--gray); }
+  .search {
+    width: 100%; padding: 10px 14px; background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: var(--white);
+    font-size: 13px; outline: none; margin-bottom: 12px;
+  }
+  .search:focus { border-color: var(--cyan); background: rgba(0, 212, 255, 0.05); }
+  .menu-section-title {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--gray); padding: 8px 12px 4px;
+  }
+  .menu-item {
+    display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px;
+    cursor: pointer; font-size: 13px;
+  }
+  .menu-item:hover { background: linear-gradient(90deg, rgba(0, 212, 255, 0.15), rgba(123, 47, 247, 0.15)); }
+  .menu-item .icon {
+    width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    font-size: 16px; background: rgba(0, 212, 255, 0.1); border: 1px solid rgba(0, 212, 255, 0.2);
+  }
+  .menu-item .icon.term { background: rgba(100, 255, 218, 0.1); border-color: rgba(100,255,218,0.3); }
+  .menu-item .icon.files { background: rgba(255, 189, 46, 0.1); border-color: rgba(255,189,46,0.3); }
+  .menu-item .icon.settings { background: rgba(241, 7, 163, 0.1); border-color: rgba(241,7,163,0.3); }
+  .menu-item .text { flex: 1; }
+  .menu-item .text .name { font-weight: 600; }
+  .menu-item .text .desc { font-size: 11px; color: var(--gray); }
+  .window {
+    position: fixed; background: rgba(10, 25, 41, 0.92);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 212, 255, 0.25); border-radius: 10px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 40px rgba(123, 47, 247, 0.15);
+    overflow: hidden; z-index: 100; display: flex; flex-direction: column;
+    animation: windowOpen 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  @keyframes windowOpen { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: none; } }
+  .window.minimized { display: none; }
+  .window-header {
+    display: flex; align-items: center; padding: 8px 12px; gap: 10px; cursor: move;
+    background: linear-gradient(90deg, rgba(18, 43, 69, 0.95), rgba(10, 25, 41, 0.95));
+    border-bottom: 1px solid rgba(0, 212, 255, 0.15);
+  }
+  .window-title { flex: 1; font-size: 12px; font-weight: 600; }
+  .win-btn {
+    width: 24px; height: 24px; border-radius: 6px; border: none; background: transparent;
+    color: var(--gray); cursor: pointer; font-size: 14px;
+  }
+  .win-btn:hover { background: rgba(255,255,255,0.1); color: var(--white); }
+  .win-btn.close:hover { background: #ff5f56; color: white; }
+  .win-btn.min:hover { background: #ffbd2e; color: black; }
+  .win-btn.max:hover { background: #27c93f; color: black; }
+  .window-body { flex: 1; padding: 16px; overflow: auto; font-size: 13px; line-height: 1.7; }
+  .window-body.terminal {
+    background: rgba(5, 13, 22, 0.8); font-family: 'Liberation Mono', 'DejaVu Sans Mono', monospace; padding: 16px;
+  }
+  .term-line { white-space: pre-wrap; word-break: break-word; }
+  .term-prompt { color: var(--accent); }
+  .term-path { color: var(--cyan); }
+  .term-out { color: var(--gray); }
+  .term-err { color: var(--magenta); }
+  .term-input {
+    width: 100%; background: transparent; border: none; outline: none; color: var(--cyan);
+    font: inherit; user-select: text;
+  }
+  .dock {
+    position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 8px; padding: 8px 14px;
+    background: rgba(10, 25, 41, 0.8); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 212, 255, 0.2); border-radius: 16px; z-index: 900;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5), 0 0 30px rgba(123, 47, 247, 0.15);
+  }
+  .dock-item {
+    width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
+    font-size: 20px; cursor: pointer; position: relative; background: rgba(255,255,255,0.03); border: 1px solid transparent;
+  }
+  .dock-item:hover { transform: translateY(-6px) scale(1.1); background: rgba(0, 212, 255, 0.15); border-color: rgba(0, 212, 255, 0.4); }
+  .dock-item::after {
+    content: attr(data-label); position: absolute; bottom: 100%; left: 50%;
+    transform: translateX(-50%) translateY(-8px); background: rgba(5, 13, 22, 0.95);
+    color: var(--white); padding: 4px 10px; border-radius: 6px; font-size: 11px; white-space: nowrap;
+    opacity: 0; pointer-events: none; border: 1px solid rgba(0, 212, 255, 0.3);
+  }
+  .dock-item:hover::after { opacity: 1; }
+  .dock-divider { width: 1px; background: rgba(255,255,255,0.1); margin: 4px 2px; }
+  .desktop-icons {
+    position: absolute; top: calc(var(--panel-h) + 20px); left: 20px;
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  .desktop-icon {
+    width: 90px; display: flex; flex-direction: column; align-items: center; gap: 6px;
+    padding: 8px; border-radius: 8px; cursor: pointer;
+  }
+  .desktop-icon:hover { background: rgba(0, 212, 255, 0.1); }
+  .desktop-icon .ico { font-size: 32px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5)); }
+  .desktop-icon .name { font-size: 11px; text-align: center; text-shadow: 0 1px 3px rgba(0,0,0,0.9); word-break: break-word; }
+  .context-menu {
+    position: fixed; background: rgba(10, 25, 41, 0.95); backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 212, 255, 0.3); border-radius: 10px; padding: 6px;
+    z-index: 2000; min-width: 200px; box-shadow: 0 10px 40px rgba(0,0,0,0.7); display: none;
+  }
+  .context-menu.open { display: block; }
+  .ctx-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 6px; font-size: 13px; cursor: pointer; }
+  .ctx-item:hover { background: rgba(0, 212, 255, 0.15); }
+  .ctx-sep { height: 1px; background: rgba(255,255,255,0.08); margin: 4px 0; }
+  .file-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; }
+  .file-card { text-align: center; padding: 12px; border-radius: 8px; background: rgba(0,212,255,0.05); cursor: pointer; }
+  .file-card:hover { background: rgba(0,212,255,0.14); }
+  .crumb { color: var(--cyan); cursor: pointer; }
+  .set-row { padding: 12px; border-radius: 8px; background: rgba(0,212,255,0.05); border: 1px solid rgba(0,212,255,0.15); margin-bottom: 10px; }
+  .set-row label { display: block; font-size: 11px; color: var(--gray); margin-bottom: 6px; }
+  select, .urlbar {
+    width: 100%; padding: 8px 10px; background: #050d16; color: var(--white);
+    border: 1px solid rgba(0,212,255,0.3); border-radius: 6px; font-size: 13px;
+  }
+  .apply {
+    margin-top: 8px; padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer;
+    background: var(--cyan); color: #050d16; font-weight: 700;
+  }
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-thumb { background: rgba(0, 212, 255, 0.3); border-radius: 4px; }
+</style>
+</head>
+<body>
+<div class="desktop">
+  <div class="stars"></div>
+  <svg class="watermark" viewBox="0 0 100 100">
+    <polygon points="50,5 90,28 90,72 50,95 10,72 10,28" fill="none" stroke="#00d4ff" stroke-width="1"/>
+    <path d="M 38 35 L 38 65 L 52 65 Q 68 65 68 50 Q 68 35 52 35 Z" fill="none" stroke="#00d4ff" stroke-width="1.5"/>
+  </svg>
+  <div class="desktop-icons" id="desktopIcons"></div>
+</div>
+
+<div class="taskbar">
+  <div class="start-btn" id="startBtn" onclick="toggleStartMenu()">
+    <svg viewBox="0 0 100 100">
+      <defs>
+        <linearGradient id="sg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#00d4ff"/><stop offset="100%" stop-color="#7b2ff7"/>
+        </linearGradient>
+      </defs>
+      <polygon points="50,5 90,28 90,72 50,95 10,72 10,28" fill="none" stroke="url(#sg)" stroke-width="6"/>
+      <path d="M 38 35 L 38 65 L 52 65 Q 68 65 68 50 Q 68 35 52 35 Z" fill="none" stroke="url(#sg)" stroke-width="7" stroke-linejoin="round"/>
+    </svg>
+    <span class="label">DeepOS</span>
+  </div>
+  <div class="divider"></div>
+  <div class="tasks" id="tasks"></div>
+  <div class="tray">
+    <div class="tray-item" id="netIcon" title="Сеть">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0"/>
+        <circle cx="12" cy="20" r="1" fill="currentColor"/>
+      </svg>
+    </div>
+    <div class="tray-item" id="sndIcon" title="Звук">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+      </svg>
+    </div>
+    <div class="tray-item" id="pwrIcon" title="Питание">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="1" y="6" width="18" height="12" rx="2"/><line x1="23" y1="10" x2="23" y2="14"/>
+      </svg>
+    </div>
+    <div class="clock" id="clock">
+      <div class="time" id="clockTime">00:00</div>
+      <div class="date" id="clockDate">—</div>
+    </div>
+  </div>
+</div>
+
+<div class="start-menu" id="startMenu">
+  <div class="start-menu-header">
+    <div class="user-avatar" id="avatar">R</div>
+    <div class="user-info">
+      <div class="name" id="userName">root</div>
+      <div class="role" id="userRole">root@deepos</div>
+    </div>
+  </div>
+  <input type="text" class="search" id="search" placeholder="Поиск в DeepOS..." />
+  <div class="menu-section-title">Закреплено</div>
+  <div class="menu-item" data-app="term" onclick="openApp('term')">
+    <div class="icon term">▣</div>
+    <div class="text"><div class="name">DeepShell</div><div class="desc">Терминал системы</div></div>
+  </div>
+  <div class="menu-item" data-app="files" onclick="openApp('files')">
+    <div class="icon files">▤</div>
+    <div class="text"><div class="name">DeepFiles</div><div class="desc">Файловый менеджер</div></div>
+  </div>
+  <div class="menu-item" data-app="browser" onclick="openApp('browser')">
+    <div class="icon">◉</div>
+    <div class="text"><div class="name">DeepBrowser</div><div class="desc">Веб-браузер</div></div>
+  </div>
+  <div class="menu-item" data-app="settings" onclick="openApp('settings')">
+    <div class="icon settings">⚙</div>
+    <div class="text"><div class="name">Настройки</div><div class="desc">Параметры DeepOS</div></div>
+  </div>
+  <div class="menu-section-title">Система</div>
+  <div class="menu-item" data-app="about" onclick="openApp('about')">
+    <div class="icon">◈</div>
+    <div class="text"><div class="name">О системе</div><div class="desc" id="aboutDesc">DeepOS</div></div>
+  </div>
+  <div class="menu-item" onclick="shutdown()">
+    <div class="icon">⏻</div>
+    <div class="text"><div class="name">Завершение работы</div><div class="desc">Выключить DeepOS</div></div>
+  </div>
+</div>
+
+<div class="dock">
+  <div class="dock-item" data-label="DeepShell" onclick="openApp('term')">▣</div>
+  <div class="dock-item" data-label="DeepFiles" onclick="openApp('files')">▤</div>
+  <div class="dock-item" data-label="DeepBrowser" onclick="openApp('browser')">◉</div>
+  <div class="dock-divider"></div>
+  <div class="dock-item" data-label="Настройки" onclick="openApp('settings')">⚙</div>
+  <div class="dock-item" data-label="О системе" onclick="openApp('about')">◈</div>
+</div>
+
+<div class="context-menu" id="ctxMenu">
+  <div class="ctx-item" onclick="createEntry('file')">Создать файл</div>
+  <div class="ctx-item" onclick="createEntry('dir')">Создать папку</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item" onclick="renderDesktop()">Обновить</div>
+  <div class="ctx-item" onclick="openApp('settings')">Настроить рабочий стол</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item" onclick="openApp('about')">О DeepOS</div>
+</div>
+
+<script>
+const APPS = {
+  term: { title: "DeepShell — Терминал", icon: "▣", width: 680, height: 420, terminal: true },
+  files: { title: "DeepFiles", icon: "▤", width: 640, height: 440 },
+  browser: { title: "DeepBrowser", icon: "◉", width: 760, height: 480 },
+  settings: { title: "Настройки DeepOS", icon: "⚙", width: 560, height: 520 },
+  about: { title: "О системе DeepOS", icon: "◈", width: 520, height: 460 },
+  view: { title: "Файл", icon: "▤", width: 560, height: 420 }
+};
+let zIndex = 100;
+const openWindows = {};
+let info = { user: "root", host: "deepos", kernel: "", pretty: "DeepOS 1.0", addrs: [], online: false, sound: false, power: "ac", mem_total: "", mem_available: "" };
+let uiLang = "ru";
+
+function updateClock() {
+  const now = new Date();
+  const p = (n) => String(n).padStart(2, "0");
+  document.getElementById("clockTime").textContent = p(now.getHours()) + ":" + p(now.getMinutes());
+  document.getElementById("clockDate").textContent = p(now.getDate()) + "." + p(now.getMonth() + 1) + "." + now.getFullYear();
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+function toggleStartMenu() {
+  document.getElementById("startMenu").classList.toggle("open");
+  document.getElementById("startBtn").classList.toggle("active");
+}
+function closeStartMenu() {
+  document.getElementById("startMenu").classList.remove("open");
+  document.getElementById("startBtn").classList.remove("active");
+}
+document.addEventListener("click", (e) => {
+  const menu = document.getElementById("startMenu");
+  const btn = document.getElementById("startBtn");
+  if (!menu.contains(e.target) && !btn.contains(e.target)) closeStartMenu();
+  if (!e.target.closest("#ctxMenu")) document.getElementById("ctxMenu").classList.remove("open");
+});
+document.addEventListener("contextmenu", (e) => {
+  if (e.target.closest(".window") || e.target.closest(".taskbar") || e.target.closest(".dock")) return;
+  e.preventDefault();
+  const menu = document.getElementById("ctxMenu");
+  menu.style.left = e.clientX + "px";
+  menu.style.top = e.clientY + "px";
+  menu.classList.add("open");
+});
+document.getElementById("search").addEventListener("input", (e) => {
+  const q = e.target.value.toLowerCase();
+  document.querySelectorAll(".menu-item").forEach((el) => {
+    el.style.display = el.innerText.toLowerCase().includes(q) ? "" : "none";
+  });
+});
+document.addEventListener("keydown", (e) => {
+  if (e.altKey && (e.key === "s" || e.key === "S" || e.key === "ы" || e.key === "Ы")) {
+    e.preventDefault();
+    openApp("settings");
+  }
+  if (e.altKey && (e.key === "t" || e.key === "T" || e.key === "е" || e.key === "Е")) {
+    e.preventDefault();
+    openApp("term");
+  }
+});
+
+async function api(path, options) {
+  const res = await fetch(path, options);
+  return res.json();
+}
+
+function fmt(bytes) {
+  if (!bytes) return "0 Б";
+  const units = ["Б", "КБ", "МБ", "ГБ"];
+  let n = bytes, i = 0;
+  while (n >= 1024 && i < units.length - 1) { n /= 1024; i++; }
+  return n.toFixed(i ? 1 : 0) + " " + units[i];
+}
+
+async function refreshInfo() {
+  info = await api("/api/sysinfo");
+  document.getElementById("avatar").textContent = (info.user || "R").slice(0, 1).toUpperCase();
+  document.getElementById("userName").textContent = info.user;
+  document.getElementById("userRole").textContent = info.user + "@" + info.host;
+  document.getElementById("aboutDesc").textContent = info.pretty;
+  const net = document.getElementById("netIcon");
+  net.classList.toggle("on", info.online);
+  net.title = info.online ? info.addrs.map((a) => a.iface + " " + a.addr).join(", ") : "Сеть не подключена";
+  document.getElementById("sndIcon").title = info.sound ? "Звуковая карта найдена" : "Звуковая карта не найдена";
+  document.getElementById("pwrIcon").title = info.power === "battery" ? "Батарея" : "Питание от сети";
+}
+
+function iconFor(entry) {
+  if (entry.kind === "dir") return "▤";
+  if (/\.(png|jpg|jpeg|gif|webp)$/i.test(entry.name)) return "▣";
+  return "▭";
+}
+
+async function renderDesktop() {
+  document.getElementById("ctxMenu").classList.remove("open");
+  const box = document.getElementById("desktopIcons");
+  const fixed = [
+    ["files", "▤", "Домашняя папка"],
+    ["term", "▣", "DeepShell"],
+    ["about", "◈", "О системе"]
+  ];
+  box.innerHTML = fixed.map(([id, ico, name]) =>
+    `<div class="desktop-icon" ondblclick="openApp('${id}')"><div class="ico">${ico}</div><div class="name">${name}</div></div>`
+  ).join("");
+  const listing = await api("/api/files?path=" + encodeURIComponent("/root"));
+  (listing.entries || []).forEach((entry) => {
+    if (entry.name.startsWith(".")) return;
+    const el = document.createElement("div");
+    el.className = "desktop-icon";
+    el.innerHTML = `<div class="ico">${iconFor(entry)}</div><div class="name"></div>`;
+    el.querySelector(".name").textContent = entry.name;
+    el.ondblclick = () => {
+      if (entry.kind === "dir") openApp("files", "/root/" + entry.name);
+      else openApp("view", "/root/" + entry.name);
+    };
+    box.appendChild(el);
+  });
+}
+
+async function createEntry(kind) {
+  const name = prompt(kind === "dir" ? "Имя папки" : "Имя файла");
+  document.getElementById("ctxMenu").classList.remove("open");
+  if (!name) return;
+  await api("/api/create", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ path: "/root", name, kind }) });
+  renderDesktop();
+}
+
+function shellWindow(win, appId) {
+  const body = win.querySelector(".window-body");
+  body.classList.add("terminal");
+  body.style.fontSize = (window.deeposFont || 13) + "px";
+  const screen = document.createElement("div");
+  const form = document.createElement("form");
+  const prompt = document.createElement("div");
+  prompt.className = "term-line";
+  const input = document.createElement("input");
+  input.className = "term-input";
+  input.autocomplete = "off";
+  form.appendChild(prompt);
+  form.appendChild(input);
+  body.appendChild(screen);
+  body.appendChild(form);
+  const cwd = () => info.cwd || "/root";
+  function paintPrompt() {
+    prompt.innerHTML = `<span class="term-prompt">${info.user}@${info.host}</span>:<span class="term-path">${cwd()}</span>#`;
+  }
+  function add(cls, text) {
+    const line = document.createElement("div");
+    line.className = "term-line " + cls;
+    line.textContent = text;
+    screen.appendChild(line);
+    body.scrollTop = body.scrollHeight;
+  }
+  async function run(cmd) {
+    add("term-cmd", info.user + "@" + info.host + ":" + cwd() + "# " + cmd);
+    const data = await api("/api/exec", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ cmd }) });
+    info.cwd = data.cwd;
+    if (data.stdout) add("term-out", data.stdout.replace(/\s+$/, ""));
+    if (data.stderr) add("term-err", data.stderr.replace(/\s+$/, ""));
+    paintPrompt();
+    input.focus();
+  }
+  form.onsubmit = (e) => { e.preventDefault(); const cmd = input.value; input.value = ""; if (cmd.trim()) run(cmd); };
+  paintPrompt();
+  run("deepos-info");
+  setTimeout(() => run("uname -a"), 200);
+  setTimeout(() => input.focus(), 400);
+}
+
+async function filesWindow(win, start) {
+  const body = win.querySelector(".window-body");
+  let current = start || "/root";
+  async function draw() {
+    const data = await api("/api/files?path=" + encodeURIComponent(current));
+    current = data.path || current;
+    win.querySelector(".window-title").textContent = "DeepFiles — " + current;
+    const parts = current.split("/").filter(Boolean);
+    let crumb = `<span class="crumb" data-path="/">/</span>`;
+    let acc = "";
+    parts.forEach((part) => {
+      acc += "/" + part;
+      const path = acc;
+      crumb += ` / <span class="crumb" data-path="${path}">${part}</span>`;
+    });
+    const cards = (data.entries || []).map((entry) =>
+      `<div class="file-card" data-name="${entry.name}" data-kind="${entry.kind}"><div style="font-size:28px">${iconFor(entry)}</div><div>${entry.name}</div><div style="color:#8892b0;font-size:11px">${entry.kind === "dir" ? "папка" : fmt(entry.size)}</div></div>`
+    ).join("") || `<div style="color:#8892b0">Папка пуста</div>`;
+    const total = (data.entries || []).reduce((sum, entry) => sum + (entry.size || 0), 0);
+    body.innerHTML = `<div style="margin-bottom:12px">${crumb}</div><div class="file-grid">${cards}</div><div style="margin-top:16px;color:#8892b0;font-size:12px">${current} · ${(data.entries || []).length} объектов · ${fmt(total)}</div>`;
+    body.querySelectorAll(".crumb").forEach((el) => el.onclick = () => { current = el.dataset.path; draw(); });
+    body.querySelectorAll(".file-card").forEach((el) => el.ondblclick = () => {
+      const next = current.replace(/\/$/, "") + "/" + el.dataset.name;
+      if (el.dataset.kind === "dir") { current = next; draw(); }
+      else openApp("view", next);
+    });
+  }
+  draw();
+}
+
+async function viewWindow(win, path) {
+  const data = await api("/api/read?path=" + encodeURIComponent(path));
+  win.querySelector(".window-title").textContent = data.path || path;
+  const body = win.querySelector(".window-body");
+  body.classList.add("terminal");
+  body.textContent = data.text || data.error || "";
+}
+
+async function settingsWindow(win) {
+  const settings = await api("/api/settings");
+  const body = win.querySelector(".window-body");
+  const modes = ["1024x768", "1280x720", "1280x800", "1366x768", "1600x900", "1920x1080"];
+  const res = settings.RESOLUTION || "1280x800";
+  body.innerHTML = `
+    <div class="set-row"><label>Разрешение экрана</label><select id="setRes">${modes.map((m) => `<option ${m === res ? "selected" : ""}>${m}</option>`).join("")}</select></div>
+    <div class="set-row"><label>Язык интерфейса</label><select id="setLang"><option value="ru">Русский</option><option value="en">English</option></select></div>
+    <div class="set-row"><label>Клавиатура</label><select id="setKb"><option value="us,ru">EN + RU, Alt+Shift</option><option value="ru">RU</option><option value="us">EN</option></select></div>
+    <div class="set-row"><label>Шрифт терминала</label><select id="setFont"><option>11</option><option>12</option><option>14</option><option>16</option></select></div>
+    <div class="set-row"><label>Сеть</label><div id="setNet" style="color:#8892b0"></div></div>
+    <div class="set-row"><label>Память</label><div style="color:#8892b0">${info.mem_available || "—"} свободно из ${info.mem_total || "—"}</div></div>
+    <button class="apply" id="setApply">ПРИМЕНИТЬ</button>
+    <div id="setMsg" style="margin-top:8px;color:#64ffda"></div>`;
+  body.querySelector("#setLang").value = settings.UI_LANG || "ru";
+  body.querySelector("#setKb").value = settings.KEYBOARD || "us,ru";
+  body.querySelector("#setFont").value = settings.FONT_SIZE || "12";
+  body.querySelector("#setNet").textContent = info.online ? info.addrs.map((a) => a.iface + " " + a.addr).join(", ") : "Нет адреса";
+  body.querySelector("#setApply").onclick = async () => {
+    const payload = {
+      resolution: body.querySelector("#setRes").value,
+      ui_lang: body.querySelector("#setLang").value,
+      keyboard: body.querySelector("#setKb").value,
+      font_size: body.querySelector("#setFont").value
+    };
+    const result = await api("/api/settings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+    window.deeposFont = Number(payload.font_size) + 1;
+    uiLang = payload.ui_lang;
+    body.querySelector("#setMsg").textContent = result.status === "OK" ? "Применено" : "Не удалось сменить разрешение";
+    body.querySelector("#setMsg").style.color = result.status === "OK" ? "#64ffda" : "#f107a3";
+  };
+}
+
+function aboutWindow(win) {
+  const body = win.querySelector(".window-body");
+  body.innerHTML = `
+    <div style="text-align:center;padding:12px">
+      <svg viewBox="0 0 100 100" style="width:92px;height:92px;filter:drop-shadow(0 0 20px rgba(0,212,255,0.5))">
+        <defs><linearGradient id="ag" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00d4ff"/><stop offset="100%" stop-color="#7b2ff7"/></linearGradient></defs>
+        <polygon points="50,5 90,28 90,72 50,95 10,72 10,28" fill="none" stroke="url(#ag)" stroke-width="3"/>
+        <path d="M 38 35 L 38 65 L 52 65 Q 68 65 68 50 Q 68 35 52 35 Z" fill="none" stroke="url(#ag)" stroke-width="4"/>
+        <circle cx="50" cy="50" r="4" fill="#00d4ff"/>
+      </svg>
+      <h2 style="background:linear-gradient(90deg,#00d4ff,#7b2ff7);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-size:28px;font-weight:900">${info.pretty}</h2>
+      <p style="color:#8892b0;letter-spacing:3px;margin-top:4px">DEEP EDITION</p>
+      <div style="margin-top:18px;padding:16px;background:rgba(0,212,255,0.05);border-radius:10px;text-align:left;font-family:'Liberation Mono',monospace;font-size:12px;line-height:1.8">
+        <div><span style="color:#64ffda">Ядро:</span> ${info.kernel || "—"}</div>
+        <div><span style="color:#64ffda">Память:</span> ${info.mem_total || "—"}</div>
+        <div><span style="color:#64ffda">Сеть:</span> ${info.online ? info.addrs.map((a) => a.addr).join(", ") : "нет адреса"}</div>
+        <div><span style="color:#64ffda">Хост:</span> ${info.user}@${info.host}</div>
+      </div>
+      <p style="color:#8892b0;font-size:11px;margin-top:16px;font-style:italic">Built by hand. Runs by heart.</p>
+    </div>`;
+}
+
+function browserWindow(win) {
+  const body = win.querySelector(".window-body");
+  body.style.padding = "12px";
+  body.innerHTML = `
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <input class="urlbar" id="url" value="https://example.com">
+      <button class="apply" id="go">Открыть</button>
+    </div>
+    <iframe id="frame" style="width:100%;height:calc(100% - 52px);border:1px solid rgba(0,212,255,0.2);border-radius:8px;background:#050d16"></iframe>`;
+  const frame = body.querySelector("#frame");
+  const url = body.querySelector("#url");
+  const go = () => { frame.src = url.value; };
+  body.querySelector("#go").onclick = go;
+  url.addEventListener("keydown", (e) => { if (e.key === "Enter") go(); });
+  frame.srcdoc = `<body style="margin:0;background:#050d16;color:#e6f1ff;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;text-align:center"><div><h1 style="background:linear-gradient(90deg,#00d4ff,#7b2ff7);-webkit-background-clip:text;color:transparent">DeepOS</h1><p style="color:#8892b0">${info.pretty}<br>${info.user}@${info.host}</p></div></body>`;
+}
+
+function openApp(appId, extra) {
+  closeStartMenu();
+  const app = APPS[appId];
+  if (!app) return;
+  const key = appId + (extra || "");
+  if (openWindows[key]) {
+    const win = openWindows[key];
+    win.classList.remove("minimized");
+    win.style.zIndex = ++zIndex;
+    updateTasks();
+    return;
+  }
+  const win = document.createElement("div");
+  win.className = "window";
+  win.style.width = app.width + "px";
+  win.style.height = app.height + "px";
+  win.style.left = Math.max(12, (innerWidth - app.width) / 2) + "px";
+  win.style.top = Math.max(56, (innerHeight - app.height) / 2) + "px";
+  win.style.zIndex = ++zIndex;
+  win.innerHTML = `
+    <div class="window-header">
+      <div>${app.icon}</div>
+      <div class="window-title">${app.title}</div>
+      <button class="win-btn min">—</button>
+      <button class="win-btn max">□</button>
+      <button class="win-btn close">✕</button>
+    </div>
+    <div class="window-body"></div>`;
+  win.querySelector(".close").onclick = (e) => { e.stopPropagation(); win.remove(); delete openWindows[key]; updateTasks(); };
+  win.querySelector(".min").onclick = (e) => { e.stopPropagation(); win.classList.add("minimized"); updateTasks(); };
+  win.querySelector(".max").onclick = (e) => {
+    e.stopPropagation();
+    if (win.dataset.max === "1") {
+      win.style.width = app.width + "px"; win.style.height = app.height + "px";
+      win.style.left = win.dataset.left; win.style.top = win.dataset.top; win.dataset.max = "0";
+    } else {
+      win.dataset.left = win.style.left; win.dataset.top = win.style.top;
+      win.style.left = "0"; win.style.top = "44px"; win.style.width = "100vw"; win.style.height = "calc(100vh - 44px)";
+      win.dataset.max = "1";
+    }
+  };
+  win.addEventListener("mousedown", () => { win.style.zIndex = ++zIndex; updateTasks(); });
+  const header = win.querySelector(".window-header");
+  let drag = false, ox = 0, oy = 0;
+  header.addEventListener("mousedown", (e) => {
+    if (e.target.closest(".win-btn") || win.dataset.max === "1") return;
+    drag = true; ox = e.clientX - win.offsetLeft; oy = e.clientY - win.offsetTop;
+  });
+  document.addEventListener("mousemove", (e) => {
+    if (!drag) return;
+    win.style.left = (e.clientX - ox) + "px";
+    win.style.top = Math.max(44, e.clientY - oy) + "px";
+  });
+  document.addEventListener("mouseup", () => { drag = false; });
+  document.body.appendChild(win);
+  openWindows[key] = win;
+  if (appId === "term") shellWindow(win);
+  else if (appId === "files") filesWindow(win, extra);
+  else if (appId === "view") viewWindow(win, extra);
+  else if (appId === "settings") settingsWindow(win);
+  else if (appId === "about") aboutWindow(win);
+  else if (appId === "browser") browserWindow(win);
+  updateTasks();
+}
+
+function updateTasks() {
+  const tasks = document.getElementById("tasks");
+  tasks.innerHTML = "";
+  Object.entries(openWindows).forEach(([key, win]) => {
+    const appId = key.startsWith("view") ? "view" : key.split("/").length ? Object.keys(APPS).find((id) => key === id || key.startsWith(id)) : key;
+    const app = APPS[appId] || APPS.view;
+    const item = document.createElement("div");
+    item.className = "task-item" + (win.classList.contains("minimized") ? "" : " active");
+    item.innerHTML = `<div class="dot"></div><span>${app.icon} ${app.title.split("—")[0]}</span>`;
+    item.onclick = () => {
+      win.classList.toggle("minimized");
+      if (!win.classList.contains("minimized")) win.style.zIndex = ++zIndex;
+      updateTasks();
+    };
+    tasks.appendChild(item);
+  });
+}
+
+async function shutdown() {
+  closeStartMenu();
+  if (!confirm("Завершить работу DeepOS?")) return;
+  document.body.innerHTML = `<div style="position:fixed;inset:0;background:#050d16;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#e6f1ff"><h1 style="background:linear-gradient(90deg,#00d4ff,#7b2ff7);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-size:32px">DeepOS</h1><p style="color:#8892b0;margin-top:8px">Завершение работы...</p></div>`;
+  await api("/api/poweroff", { method: "POST", body: "{}" });
+}
+
+refreshInfo().then(renderDesktop);
+setInterval(refreshInfo, 8000);
+</script>
+</body>
+</html>

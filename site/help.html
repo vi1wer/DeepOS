@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Поддержка — DeepOS</title>
+<link rel="icon" href="favicon.svg">
+<link rel="stylesheet" href="css/site.css?v=20261006">
+</head>
+<body>
+<header class="top">
+  <div class="row">
+    <a class="logo" href="index.html"><i></i> DeepOS</a>
+    <nav class="main">
+      <a href="desktop.html">Возможности ✨</a>
+      <a href="programs.html">G-Store 🛒</a>
+      <a href="look.html">Старт</a>
+      <a href="news.html">Сборка</a>
+      <a href="help.html" aria-current="page">Поддержка</a>
+    </nav>
+    <form action="help.html" method="get">
+      <input class="search" id="q" type="search" name="q" placeholder="Поиск" aria-label="Поиск">
+    </form>
+  </div>
+</header>
+<main>
+  <div class="wrap page-hero">
+    <p class="kicker">Поддержка</p>
+    <h1>Найти ответ</h1>
+    <p id="count">Коротко о том, что чаще всего спрашивают. Поиск сверху оставляет подходящие карточки.</p>
+  </div>
+  <div class="wrap support-grid" id="list">
+    <article class="ans" data-text="поиск пуск программа файл">
+      <h2>Как найти программу</h2>
+      <p>Откройте Пуск и начните печатать. Ищутся названия программ и файлов на столе и в домашней папке.</p>
+    </article>
+    <article class="ans" data-text="часы время пояс самара дата">
+      <h2>Часы показывают не то время</h2>
+      <p>Настройки → Время и язык. Для этого компьютера нужен пояс «Самара, UTC+4».</p>
+    </article>
+    <article class="ans" data-text="сеть интернет адрес">
+      <h2>Нет сети</h2>
+      <p>Настройки → Сеть. Если адреса нет, погода и каталог программ не обновятся.</p>
+    </article>
+    <article class="ans" data-text="программы индекс каталог">
+      <h2>Каталог пустой</h2>
+      <p>В окне «Программы» нажмите «Обновить индекс». До этого поиск не из чего выбирать.</p>
+    </article>
+    <article class="ans" data-text="звук громкость">
+      <h2>Звука нет</h2>
+      <p>Настройки → Звук. Ползунок сохранится и без звуковой карты, но вывести звук будет некуда.</p>
+    </article>
+    <article class="ans" data-text="корзина файл восстановить">
+      <h2>Вернуть файл</h2>
+      <p>Корзина → «Восстановить». «Очистить» стирает всё. Можно очищать корзину при следующем входе.</p>
+    </article>
+    <article class="ans" data-text="обои тема шрифт">
+      <h2>Поменять облик</h2>
+      <p>Настройки → Персонализация: рисунок, палитра, шрифт, анимация, звуки и часы.</p>
+    </article>
+    <article class="ans" data-text="лупа контраст курсор">
+      <h2>Сделать крупнее</h2>
+      <p>Настройки → Специальные возможности: шрифт, контраст, лупа, курсор, клавиатура, озвучка.</p>
+    </article>
+  </div>
+  <p class="wrap" id="empty" hidden>Ничего не нашлось. Попробуйте: часы, сеть, программы, корзина.</p>
+</main>
+<footer class="foot">
+  <div class="row"><div class="legal"><a href="index.html">DeepOS</a><span>Поддержка</span></div></div>
+</footer>
+<script>
+(function () {
+  var box = document.getElementById("q");
+  var items = Array.prototype.slice.call(document.querySelectorAll("#list article"));
+  var empty = document.getElementById("empty");
+  var count = document.getElementById("count");
+  function apply() {
+    var q = (box.value || "").trim().toLowerCase();
+    var n = 0;
+    items.forEach(function (el) {
+      var hay = (el.innerText + " " + (el.getAttribute("data-text") || "")).toLowerCase();
+      var on = !q || hay.indexOf(q) !== -1;
+      el.hidden = !on;
+      if (on) n += 1;
+    });
+    empty.hidden = n !== 0;
+    count.textContent = q ? ("Найдено: " + n) : "Коротко о том, что чаще всего спрашивают. Поиск сверху оставляет подходящие карточки.";
+  }
+  var params = new URLSearchParams(location.search);
+  if (params.get("q")) box.value = params.get("q");
+  box.addEventListener("input", apply);
+  apply();
+})();
+</script>
+</body>
+</html>

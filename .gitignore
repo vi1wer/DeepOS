@@ -1,0 +1,11 @@
+cache/
+out/
+tools/qemu/
+tools/7zip/
+__pycache__/
+*.pyc
+*.log
+*.img
+*.cpio.gz
+.DS_Store
+Thumbs.db

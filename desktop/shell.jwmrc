@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<JWM>
+  <Desktops width="1" height="1">
+    <Background type="solid">#050d16</Background>
+  </Desktops>
+  <Group>
+    <Class>epiphany</Class>
+    <Option>maximized</Option>
+    <Option>noborder</Option>
+    <Option>sticky</Option>
+  </Group>
+  <Group>
+    <Class>Epiphany</Class>
+    <Option>maximized</Option>
+    <Option>noborder</Option>
+    <Option>sticky</Option>
+  </Group>
+  <Group>
+    <Class>org.gnome.Epiphany</Class>
+    <Option>maximized</Option>
+    <Option>noborder</Option>
+    <Option>sticky</Option>
+  </Group>
+  <Group>
+    <Class>org.gnome.Epiphany.WebApp_deepos</Class>
+    <Option>maximized</Option>
+    <Option>noborder</Option>
+    <Option>sticky</Option>
+  </Group>
+  <StartupCommand>deepos-browser</StartupCommand>
+</JWM>

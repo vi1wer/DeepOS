@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Скачать сборку — DeepOS</title>
+<link rel="icon" href="favicon.svg">
+<link rel="stylesheet" href="css/site.css?v=20261006b">
+</head>
+<body>
+<header class="top">
+  <div class="row">
+    <a class="logo" href="index.html"><i></i> DeepOS</a>
+    <nav class="main">
+      <a href="desktop.html">Возможности ✨</a>
+      <a href="programs.html">G-Store 🛒</a>
+      <a href="look.html">Старт</a>
+      <a href="news.html">Сборка</a>
+      <a href="help.html">Поддержка</a>
+    </nav>
+    <form action="help.html" method="get">
+      <input class="search" type="search" name="q" placeholder="Поиск" aria-label="Поиск">
+    </form>
+  </div>
+</header>
+<main>
+  <div class="wrap page-hero">
+    <p class="kicker">DeepOS</p>
+    <h1>Скачать сборку <span id="ver">2026.10.06-build.8</span></h1>
+    <p>Два файла текущей сборки с этого компьютера. Образ — сама система. Второй файл нужен, чтобы она стартовала. Положите оба в папку out рядом с запуском.</p>
+    <div class="actions">
+      <a class="btn solid" id="image" href="/download/deepos-rootfs.cpio.gz">Скачать образ</a>
+      <a class="btn ghost" id="boot" href="/download/vmlinuz">Скачать файл запуска</a>
+    </div>
+    <p id="sizes" class="lead"></p>
+  </div>
+</main>
+<footer class="foot">
+  <div class="row"><div class="legal"><a href="index.html">DeepOS</a><span>Сборка <span class="deepos-day">2026.10.15</span></span></div></div>
+</footer>
+<script>
+(function () {
+  function mib(n) {
+    return (n / 1048576).toFixed(n > 20 * 1048576 ? 0 : 1).replace(".", ",") + " МБ";
+  }
+  fetch("/download/version", { cache: "no-store" }).then(function (r) { return r.text(); }).then(function (t) {
+    var name = t.replace(/^DeepOS\s*/, "").trim();
+    if (name) document.getElementById("ver").textContent = name;
+  }).catch(function () {});
+  Promise.all(["/download/deepos-rootfs.cpio.gz", "/download/vmlinuz"].map(function (url) {
+    return fetch(url, { method: "HEAD", cache: "no-store" }).then(function (r) {
+      return Number(r.headers.get("Content-Length") || 0);
+    });
+  })).then(function (sizes) {
+    var line = "Образ " + mib(sizes[0]) + ". Файл запуска " + mib(sizes[1]) + ".";
+    document.getElementById("sizes").textContent = line;
+  }).catch(function () {});
+})();
+</script>
+</body>
+</html>
